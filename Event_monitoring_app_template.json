@@ -1,0 +1,71 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "CloudFormation Stack for Event Monitoring Application using AWS Free Tier Services.",
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": "my-event-monitoring-app-bucket"
+      },
+      "DeletionPolicy": "Retain"
+    },
+    "SNSTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "Event Notifications",
+        "TopicName": "event-notifications-topic"
+      },
+      "DeletionPolicy": "Retain"
+    },
+    "S3BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "S3Bucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": "s3:GetObject",
+              "Resource": "arn:aws:s3:::my-event-monitoring-app-bucket/*"
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain"
+    },
+    "IAMRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "sns.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        }
+      },
+      "DeletionPolicy": "Retain"
+    }
+  },
+  "Outputs": {
+    "S3BucketURL": {
+      "Description": "URL of the S3 bucket",
+      "Value": "https://my-app-frontend101.s3.eu-north-1.amazonaws.com/clouformation+stack/"
+    },
+    "SNSTopicARN": {
+      "Description": "SNS Topic ARN",
+      "Value": {
+        "Ref": "SNSTopic"
+      }
+    }
+  }
+}
